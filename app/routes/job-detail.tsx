@@ -152,7 +152,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     { name: "twitter:description", content: `${shortDesc} — ${tagline}` },
     { name: "twitter:image", content: ogImage },
   ];
-};
+  
 function useTheme() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
