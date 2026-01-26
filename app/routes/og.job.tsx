@@ -1,16 +1,12 @@
 import { ImageResponse } from "@vercel/og";
+import type { LoaderFunctionArgs } from "@react-router/node";
 
-export const config = {
-  runtime: "edge",
-};
-
-export async function GET(request: Request) {
+export async function loader({ request }: LoaderFunctionArgs) {
   const { searchParams } = new URL(request.url);
 
   const title = searchParams.get("title") || "Job";
   const company = searchParams.get("company") || "Promoter";
   const rate = searchParams.get("rate") || "";
-
 
   return new ImageResponse(
     (
@@ -27,7 +23,6 @@ export async function GET(request: Request) {
           fontFamily: "system-ui, -apple-system, Segoe UI, Roboto, Arial",
         }}
       >
-        {/* Top row */}
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div
             style={{
@@ -43,9 +38,9 @@ export async function GET(request: Request) {
             SQRZ
           </div>
 
+          <div style={{ fontSize: 20, opacity: 0.7 }}>jobs.sqrz.com</div>
         </div>
 
-        {/* Center */}
         <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
           <div style={{ fontSize: 64, fontWeight: 900, lineHeight: 1.05 }}>
             {title}
@@ -70,7 +65,6 @@ export async function GET(request: Request) {
           ) : null}
         </div>
 
-        {/* Bottom */}
         <div style={{ fontSize: 24, opacity: 0.7 }}>
           The LinkInBio that gets you booked!
         </div>
