@@ -24,7 +24,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   const XANO_BASE_URL = import.meta.env.VITE_XANO_BASE_URL;
   if (!XANO_BASE_URL) {
-    throw new Error("Missing VITE_XANO_BASE_URL");
+    throw new Response("Missing VITE_XANO_BASE_URL", { status: 500 });
   }
 
   try {
