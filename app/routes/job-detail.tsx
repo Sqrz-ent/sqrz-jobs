@@ -6,7 +6,7 @@ type Job = {
   company_name: string;
   company_slug: string;
   position_title: string;
-  slug: string;
+  position_slug: string;
   description?: string;
 };
 
@@ -24,7 +24,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
   const url = new URL(`${XANO_BASE_URL}/jobs`);
   url.searchParams.set("company_slug", company);
-  url.searchParams.set("slug", position);
+  url.searchParams.set("position_slug", position);
 
   const res = await fetch(url.toString());
 
