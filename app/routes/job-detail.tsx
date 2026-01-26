@@ -27,25 +27,32 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Error("Missing VITE_XANO_BASE_URL");
   }
 
-  const url = new URL(`${XANO_BASE_URL}/jobs`);
-  url.searchParams.set("company_slug", company);
-  url.searchParams.set("position_slug", position);
+  try {
+    const url = new URL(`${XANO_BASE_URL}/jobs`);
+    url.searchParams.set("company_slug", company);
+    url.searchParams.set("position_slug", position);
 
-  const res = await fetch(url.toString());
+    const res = await fetch(url.toString());
 
-  if (!res.ok) {
-    throw new Response("Not Found", { status: 404 });
+    if (!res.ok) {
+      throw new Response("Not Found", { status: 404 });
+    }
+
+    const data = await res.json();
+    const job: Job | undefined = Array.isArray(data) ? data[0] : data;
+
+    if (!job) {
+      throw new Response("Not Found", { status: 404 });
+    }
+
+    return job;
+  } catch (err) {
+    throw err instanceof Response
+      ? err
+      : new Error(err instanceof Error ? err.message : "Unknown loader error");
   }
-
-  const data = await res.json();
-  const job: Job | undefined = Array.isArray(data) ? data[0] : data;
-
-  if (!job) {
-    throw new Response("Not Found", { status: 404 });
-  }
-
-  return job;
 }
+
 
 export default function JobDetail() {
   const job = useLoaderData<Job>();
@@ -83,10 +90,13 @@ export function ErrorBoundary() {
     }
   }
 
-  return (
-    <main style={{ padding: 32 }}>
-      <h1>Something went wrong</h1>
-      <pre>{String(error)}</pre>
-    </main>
-  );
+ return (
+  <main style={{ padding: 32 }}>
+    <h1>Something went wrong</h1>
+    <pre style={{ whiteSpace: "pre-wrap" }}>
+      {error instanceof Error ? error.message : JSON.stringify(error)}
+    </pre>
+  </main>
+);
+
 }
