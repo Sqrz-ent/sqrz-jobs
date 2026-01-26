@@ -145,7 +145,7 @@ export default function JobDetail() {
             fontSize: 14,
           }}
         >
-          {skill.task}                 // ← THIS is what you want
+          {skill.task}
         </span>
       ))}
     </div>
