@@ -1,5 +1,11 @@
 import { useLoaderData } from "react-router";
 import type { LoaderFunctionArgs } from "@react-router/node";
+import {
+  useLoaderData,
+  isRouteErrorResponse,
+  useRouteError,
+} from "react-router";
+import type { LoaderFunctionArgs } from "@react-router/node";
 
 type Job = {
   id: string;
@@ -58,6 +64,30 @@ export default function JobDetail() {
           dangerouslySetInnerHTML={{ __html: job.description }}
         />
       )}
+    </main>
+  );
+}
+
+
+
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  if (isRouteErrorResponse(error)) {
+    if (error.status === 404) {
+      return (
+        <main style={{ padding: 32 }}>
+          <h1>Job not found</h1>
+          <p>This position may have been removed or renamed.</p>
+        </main>
+      );
+    }
+  }
+
+  return (
+    <main style={{ padding: 32 }}>
+      <h1>Something went wrong</h1>
+      <pre>{String(error)}</pre>
     </main>
   );
 }
