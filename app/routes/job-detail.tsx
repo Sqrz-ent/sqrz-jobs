@@ -56,7 +56,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
     { status: 500 }
   );
 }
-
+}
 
 export default function JobDetail() {
   const job = useLoaderData<Job>();
