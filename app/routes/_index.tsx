@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useFetcher, useLoaderData, useSearchParams } from "react-router";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { useEffect, useMemo, useRef, useState } from "react";
 
 
 
