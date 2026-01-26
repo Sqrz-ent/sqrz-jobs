@@ -5,6 +5,7 @@ import {
   useRouteError,
 } from "react-router";
 import type { LoaderFunctionArgs } from "@react-router/node";
+import type { MetaFunction, LinksFunction } from "@remix-run/node";
 
 type Job = {
   id: string;
@@ -68,7 +69,61 @@ export async function loader({ params }: LoaderFunctionArgs) {
     );
   }
 }
+export const links: LinksFunction = () => {
+  return [
+    { rel: "icon", href: "/sqrz-favicon.png", type: "image/png" },
+    { rel: "apple-touch-icon", href: "/sqrz-apple-touch.png" },
+  ];
+};
 
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (!data) {
+    return [
+      { title: "Job not found | SQRZ" },
+      {
+        name: "description",
+        content: "SQRZ – The LinkInBio that gets you booked!",
+      },
+    ];
+  }
+
+  const job = data as Job;
+
+  const title = `${job.position_title} at ${job.company_name} | SQRZ`;
+
+  // 1-line job description for SEO + previews
+  const shortDesc = job.hourly_rate
+    ? `${job.company_name} is hiring: ${job.position_title} (${job.hourly_rate}).`
+    : `${job.company_name} is hiring: ${job.position_title}.`;
+
+  // non-visible branding text
+  const tagline = "SQRZ – The LinkInBio that gets you booked!";
+
+  // Preview image strategy (fast version for now):
+  // You can replace this later with a true dynamic OG generator.
+  const ogImage = "/og/og-1.png";
+
+  return [
+    { title },
+    { name: "description", content: shortDesc },
+
+    // non-visible SQRZ tagline
+    { name: "application-name", content: "SQRZ" },
+    { name: "generator", content: tagline },
+
+    // OpenGraph
+    { property: "og:title", content: title },
+    { property: "og:description", content: `${shortDesc} — ${tagline}` },
+    { property: "og:type", content: "article" },
+    { property: "og:image", content: ogImage },
+
+    // Twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: `${shortDesc} — ${tagline}` },
+    { name: "twitter:image", content: ogImage },
+  ];
+};
 function useTheme() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
