@@ -265,7 +265,6 @@ export default function JobsIndex() {
         display: "flex",
         flexDirection: "column",
         gap: 10,
-        const snippet = makeSnippet(job.description_md || job.description, 200);
       } as const,
 
       cardTitle: {
@@ -407,6 +406,7 @@ export default function JobsIndex() {
           {items.map((job) => {
             const date = formatDate(job.start);
             const venue = job.venues?.[0]?.name || job.venues?.[0]?.full_address;
+            const snippet = makeSnippet(job.description_md || job.description, 200);
 
             return (
               <Link key={job.id} to={`/${job.slug}`} style={styles.card}>
