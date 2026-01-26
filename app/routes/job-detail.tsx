@@ -47,10 +47,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
     return job;
   } catch (err) {
-    throw err instanceof Response
-      ? err
-      : new Error(err instanceof Error ? err.message : "Unknown loader error");
+     if (err instanceof Response) {
+    throw err;
   }
+
+  throw new Response(
+    err instanceof Error ? err.message : "Unknown server error",
+    { status: 500 }
+  );
 }
 
 
