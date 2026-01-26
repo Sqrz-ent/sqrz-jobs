@@ -4,30 +4,38 @@ import type { LoaderFunctionArgs } from "@react-router/node";
 export async function loader({ params }: LoaderFunctionArgs) {
   const { company, position } = params;
 
+  if (!company || !position) {
+    throw new Response("Not Found", { status: 404 });
+  }
+
   const XANO_BASE_URL = import.meta.env.VITE_XANO_BASE_URL;
+  if (!XANO_BASE_URL) {
+    throw new Error("Missing VITE_XANO_BASE_URL");
+  }
+
+  const url = new URL(`${XANO_BASE_URL}/jobs`);
+  url.searchParams.set("company_slug", company);
+  url.searchParams.set("slug", position);
+
+  const res = await fetch(url.toString());
 
   return {
-    company,
-    position,
-    hasEnv: Boolean(XANO_BASE_URL),
-    baseUrl: XANO_BASE_URL ? "env-loaded" : "missing",
+    ok: res.ok,
+    status: res.status,
   };
 }
 
 export default function JobDetail() {
   const data = useLoaderData<{
-    company?: string;
-    position?: string;
-    hasEnv: boolean;
-    baseUrl: string;
+    ok: boolean;
+    status: number;
   }>();
 
   return (
     <main style={{ padding: 32 }}>
       <h1>Job detail</h1>
-      <p>Company: {data.company}</p>
-      <p>Position: {data.position}</p>
-      <p>Env present: {String(data.hasEnv)}</p>
+      <p>Fetch OK: {String(data.ok)}</p>
+      <p>Status: {data.status}</p>
     </main>
   );
 }
