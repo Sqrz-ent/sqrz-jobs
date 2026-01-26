@@ -95,6 +95,90 @@ function useTheme() {
   return { theme, setTheme };
 }
 
+
+function escapeHtml(str: string) {
+  return str
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function formatJobDescriptionToHtml(raw: string) {
+  const text = raw.trim();
+
+  // 1) Normalize spacing
+  const normalized = text
+    .replace(/\r\n/g, "\n")
+    .replace(/[ \t]+/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  // 2) Headings we want to detect
+  const headings = [
+    "You are a good fit if you:",
+    "About the role",
+    "Application process",
+    "Pay and legal status",
+  ];
+
+  // 3) Insert newlines before headings so we can split
+  let withBreaks = normalized;
+  for (const h of headings) {
+    const re = new RegExp(`\\s*${h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*`, "g");
+    withBreaks = withBreaks.replace(re, `\n\n${h}\n`);
+  }
+
+  // 4) Split into blocks by double newlines
+  const blocks = withBreaks
+    .split(/\n\s*\n/g)
+    .map((b) => b.trim())
+    .filter(Boolean);
+
+  // 5) Convert blocks into HTML
+  const htmlParts: string[] = [];
+
+  for (const block of blocks) {
+    const isHeading = headings.includes(block);
+
+    if (isHeading) {
+      htmlParts.push(`<h3>${escapeHtml(block.replace(/:$/, ""))}</h3>`);
+      continue;
+    }
+
+    // Detect bullet-ish blocks: many short phrases separated by periods
+    // OR block contains multiple "Strong / Comfort / Familiarity / Background" patterns
+    const bulletish =
+      /Strong |Comfort |Familiarity |Background |Generalist |You must |This role |We will /i.test(block) &&
+      block.length > 120;
+
+    if (bulletish) {
+      // Split into bullet sentences (simple heuristic)
+      const items = block
+        .split(/(?<=[.])\s+(?=[A-Z])/g)
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+
+      // If we got enough items, render as list
+      if (items.length >= 3) {
+        htmlParts.push(
+          `<ul>${items
+            .map((i) => `<li>${escapeHtml(i.replace(/\.$/, ""))}</li>`)
+            .join("")}</ul>`
+        );
+        continue;
+      }
+    }
+
+    // Default paragraph
+    htmlParts.push(`<p>${escapeHtml(block)}</p>`);
+  }
+
+  return htmlParts.join("\n");
+}
+
+
 export default function JobDetail() {
   const job = useLoaderData<Job>();
   const { theme, setTheme } = useTheme();
@@ -379,14 +463,17 @@ export default function JobDetail() {
 
             {/* Job description */}
             {job.description && (
-              <section style={{ marginBottom: 26 }}>
-                <div style={styles.sectionTitle}>About the role</div>
-                <div
-                  style={styles.richText}
-                  dangerouslySetInnerHTML={{ __html: job.description }}
-                />
-              </section>
-            )}
+  <section style={{ marginBottom: 26 }}>
+    <div style={styles.sectionTitle}>About the role</div>
+    <div
+      style={styles.richText}
+      dangerouslySetInnerHTML={{
+        __html: formatJobDescriptionToHtml(job.description),
+      }}
+    />
+  </section>
+)}
+
 
             {/* Company info */}
             {job.company_description && (
