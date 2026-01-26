@@ -11,7 +11,6 @@ export async function GET(request: Request) {
   const company = searchParams.get("company") || "Promoter";
   const rate = searchParams.get("rate") || "";
 
-  const logoUrl = new URL("/sqrz-logo.png", request.url).toString();
 
   return new ImageResponse(
     (
@@ -44,7 +43,6 @@ export async function GET(request: Request) {
             SQRZ
           </div>
 
-          <img src={logoUrl} width={56} height={56} />
         </div>
 
         {/* Center */}
