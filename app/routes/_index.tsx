@@ -44,6 +44,34 @@ export const meta: MetaFunction = () => {
   ];
 };
 
+function useTheme() {
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("theme");
+    if (stored === "light" || stored === "dark") {
+      setTheme(stored);
+      return;
+    }
+
+    // default to system
+    const prefersDark =
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches;
+
+    setTheme(prefersDark ? "dark" : "light");
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  return { theme, setTheme };
+}
+
+
+
 function stripMarkdown(text: string) {
   return text
     // remove markdown links [text](url)
@@ -116,6 +144,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function JobsIndex() {
+  const { theme, setTheme } = useTheme();
+  const isDark = theme === "dark";
   const initial = useLoaderData<JobsResponse>();
   const fetcher = useFetcher<JobsResponse>();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -146,20 +176,23 @@ export default function JobsIndex() {
 
   const isLoadingMore = fetcher.state !== "idle";
 
-  const colors = useMemo(() => {
-    return {
-      bg: "#f6f7fb",
-      surface: "#ffffff",
-      surface2: "#f3f4f6",
-      border: "rgba(0,0,0,0.08)",
-      text: "#0f172a",
-      textMuted: "rgba(15,23,42,0.65)",
-      brand: "#f3b130",
-      brandText: "#0b0f17",
-      shadow: "0 18px 60px rgba(15,23,42,0.12)",
-      link: "#2563eb",
-    };
-  }, []);
+const colors = useMemo(() => {
+  return {
+    bg: isDark ? "#0b0f17" : "#f6f7fb",
+    surface: isDark ? "#101827" : "#ffffff",
+    surface2: isDark ? "#0f172a" : "#f3f4f6",
+    border: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
+    text: isDark ? "#e5e7eb" : "#0f172a",
+    textMuted: isDark ? "rgba(229,231,235,0.72)" : "rgba(15,23,42,0.65)",
+    brand: "#f3b130",
+    brandText: "#0b0f17",
+    shadow: isDark
+      ? "0 18px 60px rgba(0,0,0,0.55)"
+      : "0 18px 60px rgba(15,23,42,0.12)",
+    link: isDark ? "#93c5fd" : "#2563eb",
+  };
+}, [isDark]);
+
 
   const styles = useMemo(() => {
     return {
@@ -211,6 +244,32 @@ export default function JobsIndex() {
         fontSize: 13,
         lineHeight: 1,
       } as const,
+
+
+      themeToggle: {
+  position: "fixed",
+  left: 16,
+  bottom: 16,
+  zIndex: 50,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  width: 46,
+  height: 46,
+  borderRadius: 999,
+  background: colors.surface,
+  border: `1px solid ${colors.border}`,
+  boxShadow: isDark
+    ? "0 10px 28px rgba(0,0,0,0.55)"
+    : "0 10px 28px rgba(15,23,42,0.18)",
+  cursor: "pointer",
+  userSelect: "none",
+} as const,
+
+themeToggleIcon: {
+  fontSize: 18,
+} as const,
+
 
 
       searchRow: {
@@ -373,6 +432,18 @@ export default function JobsIndex() {
               {q && <span style={styles.pill}>🔎 “{q}”</span>}
             </div>
           </div>
+
+          <button
+          type="button"
+          aria-label="Toggle dark mode"
+          onClick={() => setTheme(isDark ? "light" : "dark")}
+         style={styles.themeToggle}
+         title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+          >
+         <span style={styles.themeToggleIcon}>{isDark ? "☀️" : "🌙"}</span>
+        </button>
+
+
 
           <a
             href="https://sqrz.com"
