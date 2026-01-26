@@ -63,6 +63,7 @@ export default function JobDetail() {
 
   return (
     <main style={{ padding: 32, maxWidth: 800 }}>
+            <pre>{JSON.stringify(job, null, 2)}</pre>
       <h1>{job.position_title}</h1>
       <p>
         <strong>{job.company_name}</strong>
@@ -104,3 +105,5 @@ export function ErrorBoundary() {
 );
 
 }
+
+
