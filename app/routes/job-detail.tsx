@@ -137,7 +137,7 @@ export default function JobDetail() {
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
    {job.skills.map((skill) => (
   <span
-    key={skill.id}
+    key={skill.task}
     style={{
       padding: "6px 12px",
       background: "#f1f1f1",
