@@ -17,7 +17,14 @@ export async function loader({ params }: LoaderFunctionArgs) {
     throw new Response("Not Found", { status: 404 });
   }
 
-  const url = new URL("https://xuwq-ib46-ag3b.f2.xano.io/api:215ig9EX/jobs");
+const XANO_BASE_URL = process.env.XANO_BASE_URL;
+
+if (!XANO_BASE_URL) {
+  throw new Error("Missing XANO_BASE_URL");
+}
+
+const url = new URL(`${XANO_BASE_URL}/jobs`);
+
   url.searchParams.set("company_slug", company);
   url.searchParams.set("slug", position);
 
