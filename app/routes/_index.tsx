@@ -19,6 +19,8 @@ type Job = {
   start?: number;
   end?: number;
   venues?: Venue[];
+  description?: string;
+
 };
 
 type JobsResponse = {
@@ -40,6 +42,36 @@ export const meta: MetaFunction = () => {
     },
   ];
 };
+
+function stripMarkdown(text: string) {
+  return text
+    // remove markdown links [text](url)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1")
+    // remove inline code
+    .replace(/`([^`]+)`/g, "$1")
+    // remove headings/bullets markers
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^[-*+]\s+/gm, "")
+    // remove emphasis markers
+    .replace(/[*_~]+/g, "")
+    // normalize whitespace
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function makeSnippet(raw?: string, max = 180) {
+  if (!raw) return "";
+  const clean = stripMarkdown(raw);
+
+  if (clean.length <= max) return clean;
+
+  // cut at a nice boundary
+  const sliced = clean.slice(0, max);
+  const lastSpace = sliced.lastIndexOf(" ");
+  return (lastSpace > 80 ? sliced.slice(0, lastSpace) : sliced).trim() + "…";
+}
+
+
 
 function formatDate(ts?: number) {
   if (!ts) return null;
@@ -233,6 +265,7 @@ export default function JobsIndex() {
         display: "flex",
         flexDirection: "column",
         gap: 10,
+        const snippet = makeSnippet(job.description_md || job.description, 200);
       } as const,
 
       cardTitle: {
@@ -250,6 +283,22 @@ export default function JobsIndex() {
         color: colors.textMuted,
         fontSize: 13,
       } as const,
+
+      snippet: {
+  margin: 0,
+  marginTop: 2,
+  color: colors.textMuted,
+  fontSize: 14,
+  lineHeight: 1.5,
+
+  // clamp to 3 lines (nice for cards)
+  display: "-webkit-box",
+  WebkitLineClamp: 3,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+} as const,
+
+
 
       footerRow: {
         display: "flex",
