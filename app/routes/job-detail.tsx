@@ -9,15 +9,12 @@ import type { MetaFunction, LinksFunction } from "@remix-run/node";
 
 type Job = {
   id: string;
-
+  origin?: string;
   promoter: string; // was company_name
   company_slug: string;
-
   name: string; // was position_title
   position_slug: string;
-
   description?: string;
-
   hourly_rate?: string;
   skills?: {
     id: number;
@@ -26,8 +23,7 @@ type Job = {
   company_description?: string;
   apply_url?: string;
 };
-
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
   const { company, position } = params;
 
   if (!company || !position) {
@@ -52,7 +48,6 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
     const data = await res.json();
 
-    // Xano paginated list shape
     const job: Job | undefined = Array.isArray(data)
       ? data[0]
       : Array.isArray(data.items)
@@ -63,7 +58,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
       throw new Response("Not Found", { status: 404 });
     }
 
-    return job;
+    // ✅ Needed for absolute OG image URLs
+    const origin = new URL(request.url).origin;
+
+    return { ...job, origin };
   } catch (err) {
     if (err instanceof Response) throw err;
 
@@ -73,6 +71,9 @@ export async function loader({ params }: LoaderFunctionArgs) {
     );
   }
 }
+
+
+
 
 /** ✅ favicon / apple icon */
 export const links: LinksFunction = () => {
@@ -106,7 +107,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
   return [
     { title },
-    { name: "description", content: shortDesc },
+    { name: "description", content: "SQRZ – The LinkInBio that gets you booked!" },
 
     // non-visible branding
     { name: "application-name", content: "SQRZ" },
