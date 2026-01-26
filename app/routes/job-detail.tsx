@@ -13,6 +13,11 @@ type Job = {
   position_title: string;
   position_slug: string;
   description?: string;
+
+  hourly_rate?: string;        // e.g. "$80–120 / hr"
+  skills?: string[];           // e.g. ["React", "Figma", "Webflow"]
+  company_description?: string;
+  apply_url?: string;          // external referral link
 };
 
 export async function loader({ params }: LoaderFunctionArgs) {
@@ -75,17 +80,121 @@ export default function JobDetail() {
   const job = useLoaderData<Job>();
 
   return (
-    <main style={{ padding: 32, maxWidth: 800 }}>
-      <h1>{job.position_title}</h1>
-      <p>
-        <strong>{job.company_name}</strong>
-      </p>
+    <main
+      style={{
+        padding: "48px 24px",
+        maxWidth: 960,
+        margin: "0 auto",
+        fontFamily: "system-ui, -apple-system, sans-serif",
+      }}
+    >
+      {/* Header */}
+      <header style={{ marginBottom: 32 }}>
+        <h1 style={{ fontSize: 36, marginBottom: 8 }}>
+          {job.position_title}
+        </h1>
 
+        <p style={{ fontSize: 18, color: "#555" }}>
+          {job.company_name}
+        </p>
+
+        {job.hourly_rate && (
+          <p style={{ marginTop: 8, fontWeight: 500 }}>
+            💰 {job.hourly_rate}
+          </p>
+        )}
+      </header>
+
+      {/* CTA */}
+      {job.apply_url && (
+        <div style={{ marginBottom: 40 }}>
+          <a
+            href={job.apply_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-block",
+              padding: "14px 28px",
+              background: "#000",
+              color: "#fff",
+              borderRadius: 6,
+              textDecoration: "none",
+              fontWeight: 600,
+            }}
+          >
+            Apply →
+          </a>
+        </div>
+      )}
+
+      {/* Skills */}
+      {job.skills && job.skills.length > 0 && (
+        <section style={{ marginBottom: 40 }}>
+          <h2 style={{ fontSize: 20, marginBottom: 12 }}>Skills</h2>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {job.skills.map((skill) => (
+              <span
+                key={skill}
+                style={{
+                  padding: "6px 12px",
+                  background: "#f1f1f1",
+                  borderRadius: 999,
+                  fontSize: 14,
+                }}
+              >
+                {skill}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Job description */}
       {job.description && (
-        <div
-          style={{ marginTop: 24 }}
-          dangerouslySetInnerHTML={{ __html: job.description }}
-        />
+        <section style={{ marginBottom: 48 }}>
+          <h2 style={{ fontSize: 20, marginBottom: 12 }}>
+            About the role
+          </h2>
+          <div
+            style={{ lineHeight: 1.6 }}
+            dangerouslySetInnerHTML={{ __html: job.description }}
+          />
+        </section>
+      )}
+
+      {/* Company info */}
+      {job.company_description && (
+        <section style={{ marginBottom: 48 }}>
+          <h2 style={{ fontSize: 20, marginBottom: 12 }}>
+            About {job.company_name}
+          </h2>
+          <p style={{ lineHeight: 1.6 }}>
+            {job.company_description}
+          </p>
+        </section>
+      )}
+
+      {/* Bottom CTA */}
+      {job.apply_url && (
+        <footer style={{ marginTop: 64 }}>
+          <a
+            href={job.apply_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: "inline-block",
+              padding: "16px 32px",
+              background: "#000",
+              color: "#fff",
+              borderRadius: 6,
+              textDecoration: "none",
+              fontWeight: 600,
+              fontSize: 16,
+            }}
+          >
+            Apply now →
+          </a>
+        </footer>
       )}
     </main>
   );
