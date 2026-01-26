@@ -1,5 +1,6 @@
 import { useLoaderData } from "react-router";
-import type { LoaderFunctionArgs } from "react-router";
+import type { LoaderFunctionArgs } from "@react-router/node";
+
 
 type Job = {
   id: string;
