@@ -38,8 +38,21 @@ export async function loader({ params }: LoaderFunctionArgs) {
       throw new Response("Not Found", { status: 404 });
     }
 
-    const data = await res.json();
-    const job: Job | undefined = Array.isArray(data) ? data[0] : data;
+   const data = await res.json();
+
+// Xano paginated list shape
+const job: Job | undefined =
+  Array.isArray(data)
+    ? data[0]
+    : Array.isArray(data.items)
+      ? data.items[0]
+      : undefined;
+
+if (!job) {
+  throw new Response("Not Found", { status: 404 });
+}
+
+return job;
 
     if (!job) {
       throw new Response("Not Found", { status: 404 });
