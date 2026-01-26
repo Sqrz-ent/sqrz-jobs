@@ -9,9 +9,9 @@ import type { MetaFunction, LinksFunction } from "@remix-run/node";
 
 type Job = {
   id: string;
-  company_name: string;
+  promoter: string;
   company_slug: string;
-  position_title: string;
+  name: string;
   position_slug: string;
   description?: string;
 
@@ -26,7 +26,7 @@ type Job = {
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { company, position } = params;
-
+  
   if (!company || !position) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -76,25 +76,54 @@ export const links: LinksFunction = () => {
   ];
 };
 
+
+
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (!data) {
-    return [
-      { title: "Job not found | SQRZ" },
-      {
-        name: "description",
-        content: "SQRZ – The LinkInBio that gets you booked!",
-      },
-    ];
-  }
+  const tagline = "SQRZ – The LinkInBio that gets you booked!";
 
-  const job = data as Job;
+  const position = data?.name?.trim() || "Job";
+  const promoter = data?.promoter?.trim() || "Promoter";
 
-  const title = `${job.position_title} at ${job.company_name} | SQRZ`;
+  const title = `${position} • ${promoter} | SQRZ`;
 
+  const shortDesc = data?.hourly_rate
+    ? `${promoter} is looking for: ${position} (${data.hourly_rate}).`
+    : `${promoter} is looking for: ${position}.`;
+
+  const ogImage = `/og/job?title=${encodeURIComponent(
+    position
+  )}&company=${encodeURIComponent(promoter)}&rate=${encodeURIComponent(
+    data?.hourly_rate || ""
+  )}&seed=${encodeURIComponent(
+    (data?.company_slug || promoter) + "-" + (data?.position_slug || position)
+  )}`;
+
+  return [
+    { title },
+    { name: "description", content: shortDesc },
+
+    // non-visible branding
+    { name: "application-name", content: "SQRZ" },
+    { name: "generator", content: tagline },
+
+    // OpenGraph
+    { property: "og:title", content: title },
+    { property: "og:description", content: `${shortDesc} — ${tagline}` },
+    { property: "og:type", content: "article" },
+    { property: "og:image", content: ogImage },
+
+    // Twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: `${shortDesc} — ${tagline}` },
+    { name: "twitter:image", content: ogImage },
+  ];
+};
+ 
   // 1-line job description for SEO + previews
   const shortDesc = job.hourly_rate
-    ? `${job.company_name} is hiring: ${job.position_title} (${job.hourly_rate}).`
-    : `${job.company_name} is hiring: ${job.position_title}.`;
+    ? `${job.promoter} is hiring: ${job.name} (${job.hourly_rate}).`
+    : `${job.promoter} is hiring: ${job.name}.`;
 
   // non-visible branding text
   const tagline = "SQRZ – The LinkInBio that gets you booked!";
@@ -533,7 +562,7 @@ export default function JobDetail() {
             {/* Company info */}
             {job.company_description && (
               <section style={{ marginBottom: 10 }}>
-                <div style={styles.sectionTitle}>About {job.company_name}</div>
+                <div style={styles.sectionTitle}>About {job.promoter}</div>
                 <p style={{ margin: 0, ...styles.richText, color: colors.textMuted }}>
                   {job.company_description}
                 </p>
