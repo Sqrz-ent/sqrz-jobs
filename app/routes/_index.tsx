@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useFetcher, useLoaderData, useSearchParams } from "react-router";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { useEffect, useMemo, useRef, useState } from "react";
+
+
 
 type Venue = {
   id: number;
@@ -175,6 +178,7 @@ export default function JobsIndex() {
   }, [fetcher.data]);
 
   const isLoadingMore = fetcher.state !== "idle";
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
 const colors = useMemo(() => {
   return {
@@ -315,6 +319,8 @@ themeToggleIcon: {
         gap: 14,
       } as const,
 
+
+      
       card: {
         background: colors.surface,
         border: `1px solid ${colors.border}`,
@@ -416,6 +422,30 @@ themeToggleIcon: {
     fetcher.load(`/?${sp.toString()}`);
   };
 
+useEffect(() => {
+  const el = sentinelRef.current;
+  if (!el) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const first = entries[0];
+      if (!first?.isIntersecting) return;
+
+      // only load if there is a next page and we are not already loading
+      if (nextPage && fetcher.state === "idle") {
+        loadMore();
+      }
+    },
+    {
+      rootMargin: "700px", // preload earlier for smoothness
+    }
+  );
+
+  observer.observe(el);
+  return () => observer.disconnect();
+}, [nextPage, fetcher.state]); // loadMore uses nextPage internally
+
+
   return (
     <main style={styles.page}>
       <div style={styles.container}>
@@ -480,6 +510,7 @@ themeToggleIcon: {
             const date = formatDate(job.start);
             const venue = job.venues?.[0]?.name || job.venues?.[0]?.full_address;
             const snippet = makeSnippet(job.description, 200);
+            <div ref={sentinelRef} style={{ height: 1 }} />
 
 
             return (
