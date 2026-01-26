@@ -9,10 +9,13 @@ import type { MetaFunction, LinksFunction } from "@remix-run/node";
 
 type Job = {
   id: string;
-  promoter: string;
+
+  promoter: string; // was company_name
   company_slug: string;
-  name: string;
+
+  name: string; // was position_title
   position_slug: string;
+
   description?: string;
 
   hourly_rate?: string;
@@ -26,7 +29,7 @@ type Job = {
 
 export async function loader({ params }: LoaderFunctionArgs) {
   const { company, position } = params;
-  
+
   if (!company || !position) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -49,6 +52,7 @@ export async function loader({ params }: LoaderFunctionArgs) {
 
     const data = await res.json();
 
+    // Xano paginated list shape
     const job: Job | undefined = Array.isArray(data)
       ? data[0]
       : Array.isArray(data.items)
@@ -69,6 +73,8 @@ export async function loader({ params }: LoaderFunctionArgs) {
     );
   }
 }
+
+/** ✅ favicon / apple icon */
 export const links: LinksFunction = () => {
   return [
     { rel: "icon", href: "/sqrz-favicon.png", type: "image/png" },
@@ -76,8 +82,7 @@ export const links: LinksFunction = () => {
   ];
 };
 
-
-
+/** ✅ SEO + social previews */
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   const tagline = "SQRZ – The LinkInBio that gets you booked!";
 
@@ -90,6 +95,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     ? `${promoter} is looking for: ${position} (${data.hourly_rate}).`
     : `${promoter} is looking for: ${position}.`;
 
+  // NOTE: Some platforms want absolute URLs. We'll upgrade this next.
   const ogImage = `/og/job?title=${encodeURIComponent(
     position
   )}&company=${encodeURIComponent(promoter)}&rate=${encodeURIComponent(
@@ -119,40 +125,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     { name: "twitter:image", content: ogImage },
   ];
 };
- 
-  // 1-line job description for SEO + previews
-  const shortDesc = job.hourly_rate
-    ? `${job.promoter} is hiring: ${job.name} (${job.hourly_rate}).`
-    : `${job.promoter} is hiring: ${job.name}.`;
 
-  // non-visible branding text
-  const tagline = "SQRZ – The LinkInBio that gets you booked!";
-
-  // Preview image strategy (fast version for now):
-  // You can replace this later with a true dynamic OG generator.
-    const ogImage = `/og/job?title=${encodeURIComponent(job.position_title)}&company=${encodeURIComponent(job.company_name)}&rate=${encodeURIComponent(job.hourly_rate || "")}&seed=${encodeURIComponent(job.company_slug + "-" + job.position_slug)}`;
-
-  return [
-    { title },
-    { name: "description", content: shortDesc },
-
-    // non-visible SQRZ tagline
-    { name: "application-name", content: "SQRZ" },
-    { name: "generator", content: tagline },
-
-    // OpenGraph
-    { property: "og:title", content: title },
-    { property: "og:description", content: `${shortDesc} — ${tagline}` },
-    { property: "og:type", content: "article" },
-    { property: "og:image", content: ogImage },
-
-    // Twitter
-    { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: `${shortDesc} — ${tagline}` },
-    { name: "twitter:image", content: ogImage },
-  ];
-  
 function useTheme() {
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -178,7 +151,6 @@ function useTheme() {
 
   return { theme, setTheme };
 }
-
 
 function escapeHtml(str: string) {
   return str
@@ -210,7 +182,10 @@ function formatJobDescriptionToHtml(raw: string) {
   // 3) Insert newlines before headings so we can split
   let withBreaks = normalized;
   for (const h of headings) {
-    const re = new RegExp(`\\s*${h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*`, "g");
+    const re = new RegExp(
+      `\\s*${h.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*`,
+      "g"
+    );
     withBreaks = withBreaks.replace(re, `\n\n${h}\n`);
   }
 
@@ -231,11 +206,11 @@ function formatJobDescriptionToHtml(raw: string) {
       continue;
     }
 
-    // Detect bullet-ish blocks: many short phrases separated by periods
-    // OR block contains multiple "Strong / Comfort / Familiarity / Background" patterns
+    // Detect bullet-ish blocks
     const bulletish =
-      /Strong |Comfort |Familiarity |Background |Generalist |You must |This role |We will /i.test(block) &&
-      block.length > 120;
+      /Strong |Comfort |Familiarity |Background |Generalist |You must |This role |We will /i.test(
+        block
+      ) && block.length > 120;
 
     if (bulletish) {
       // Split into bullet sentences (simple heuristic)
@@ -244,7 +219,6 @@ function formatJobDescriptionToHtml(raw: string) {
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
 
-      // If we got enough items, render as list
       if (items.length >= 3) {
         htmlParts.push(
           `<ul>${items
@@ -262,7 +236,6 @@ function formatJobDescriptionToHtml(raw: string) {
   return htmlParts.join("\n");
 }
 
-
 export default function JobDetail() {
   const job = useLoaderData<Job>();
   const { theme, setTheme } = useTheme();
@@ -277,7 +250,7 @@ export default function JobDetail() {
       border: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.08)",
       text: isDark ? "#e5e7eb" : "#0f172a",
       textMuted: isDark ? "rgba(229,231,235,0.72)" : "rgba(15,23,42,0.65)",
-      brand: "#f3b130", // your main color
+      brand: "#f3b130",
       brandText: "#0b0f17",
       shadow: isDark
         ? "0 18px 60px rgba(0,0,0,0.55)"
@@ -408,7 +381,9 @@ export default function JobDetail() {
         color: colors.brandText,
         textDecoration: "none",
         fontWeight: 700,
-        border: `1px solid ${isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"}`,
+        border: `1px solid ${
+          isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.08)"
+        }`,
         cursor: "pointer",
       } as const,
 
@@ -469,7 +444,6 @@ export default function JobDetail() {
       await navigator.clipboard.writeText(window.location.href);
       alert("Link copied!");
     } catch {
-      // fallback
       prompt("Copy this link:", window.location.href);
     }
   };
@@ -491,24 +465,25 @@ export default function JobDetail() {
         <div style={styles.topBar}>
           <div style={styles.badgeRow}>
             <span style={styles.badge}>💼 Job</span>
-            {job.hourly_rate && <span style={styles.badge}>💰 {job.hourly_rate}</span>}
-            <span style={styles.badge}>🏢 {job.company_name}</span>
+            {job.hourly_rate && (
+              <span style={styles.badge}>💰 {job.hourly_rate}</span>
+            )}
+            <span style={styles.badge}>🧑‍💼 {job.promoter}</span>
           </div>
         </div>
 
         <article style={styles.card}>
           <div style={styles.cardInner}>
-            {/* Header */}
             <header>
-              <h1 style={styles.title}>{job.position_title}</h1>
+              <h1 style={styles.title}>{job.name}</h1>
+
               <div style={styles.company}>
-                {job.company_name}{" "}
+                {job.promoter}{" "}
                 <span style={{ color: colors.textMuted }}>
                   • {job.company_slug}/{job.position_slug}
                 </span>
               </div>
 
-              {/* CTA */}
               <div style={styles.ctaRow}>
                 {job.apply_url ? (
                   <a
@@ -523,7 +498,11 @@ export default function JobDetail() {
                   <span style={styles.badge}>No application link provided</span>
                 )}
 
-                <button type="button" onClick={handleCopyLink} style={styles.secondaryBtn}>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  style={styles.secondaryBtn}
+                >
                   Copy link
                 </button>
               </div>
@@ -531,7 +510,6 @@ export default function JobDetail() {
 
             <div style={styles.divider} />
 
-            {/* Skills */}
             {job.skills && job.skills.length > 0 && (
               <section style={{ marginBottom: 24 }}>
                 <div style={styles.sectionTitle}>Skills</div>
@@ -545,25 +523,28 @@ export default function JobDetail() {
               </section>
             )}
 
-            {/* Job description */}
             {job.description && (
-  <section style={{ marginBottom: 26 }}>
-    <div style={styles.sectionTitle}>About the role</div>
-    <div
-      style={styles.richText}
-      dangerouslySetInnerHTML={{
-        __html: formatJobDescriptionToHtml(job.description),
-      }}
-    />
-  </section>
-)}
+              <section style={{ marginBottom: 26 }}>
+                <div style={styles.sectionTitle}>About the role</div>
+                <div
+                  style={styles.richText}
+                  dangerouslySetInnerHTML={{
+                    __html: formatJobDescriptionToHtml(job.description),
+                  }}
+                />
+              </section>
+            )}
 
-
-            {/* Company info */}
             {job.company_description && (
               <section style={{ marginBottom: 10 }}>
                 <div style={styles.sectionTitle}>About {job.promoter}</div>
-                <p style={{ margin: 0, ...styles.richText, color: colors.textMuted }}>
+                <p
+                  style={{
+                    margin: 0,
+                    ...styles.richText,
+                    color: colors.textMuted,
+                  }}
+                >
                   {job.company_description}
                 </p>
               </section>
@@ -571,6 +552,7 @@ export default function JobDetail() {
 
             <div style={styles.bottomMeta}>
               <span>Built with SQRZ ⚡</span>
+
               <span style={{ display: "inline-flex", gap: 10, alignItems: "center" }}>
                 <a
                   href="/"
@@ -582,6 +564,7 @@ export default function JobDetail() {
                 >
                   Back
                 </a>
+
                 {job.apply_url && (
                   <a
                     href={job.apply_url}
