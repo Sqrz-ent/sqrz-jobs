@@ -1,8 +1,5 @@
-export default function Home() {
-  return (
-    <main style={{ padding: 32 }}>
-      <h1>SQRZ Jobs</h1>
-      <p>Public job disdwcdcedcovery</p>
-    </main>
-  );
+import { Outlet } from "react-router";
+
+export default function JobsLayout() {
+  return <Outlet />;
 }
