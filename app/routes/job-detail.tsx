@@ -15,7 +15,10 @@ type Job = {
   description?: string;
 
   hourly_rate?: string;        // e.g. "$80–120 / hr"
-  skills?: string[];           // e.g. ["React", "Figma", "Webflow"]
+  skills?: {
+  id: number;
+  task: string;
+}[];          // e.g. ["React", "Figma", "Webflow"]
   company_description?: string;
   apply_url?: string;          // external referral link
 };
