@@ -20,6 +20,7 @@ type Job = {
   end?: number;
   venues?: Venue[];
   description?: string;
+  description_md?: string;
 
 };
 
@@ -209,18 +210,6 @@ export default function JobsIndex() {
         color: colors.textMuted,
         fontSize: 13,
         lineHeight: 1,
-      } as const,
-
-      snippet: {
-         margin: 0,
-         marginTop: 2,
-         color: colors.textMuted,
-         fontSize: 14,
-         lineHeight: 1.5,
-         display: "-webkit-box",
-         WebkitLineClamp: 3,
-         WebkitBoxOrient: "vertical",
-         overflow: "hidden",
       } as const,
 
 
@@ -419,7 +408,8 @@ export default function JobsIndex() {
           {items.map((job) => {
             const date = formatDate(job.start);
             const venue = job.venues?.[0]?.name || job.venues?.[0]?.full_address;
-            const snippet = makeSnippet(job.description_md || job.description, 200);
+            const snippet = makeSnippet(job.description, 200);
+
 
             return (
               <Link key={job.id} to={`/${job.slug}`} style={styles.card}>
@@ -431,6 +421,9 @@ export default function JobsIndex() {
                   {date && <span style={styles.pill}>📅 {date}</span>}
                   {venue && <span style={styles.pill}>📍 {venue}</span>}
                 </div>
+
+              {snippet && <p style={styles.snippet}>{snippet}</p>}
+
 
                 <div style={styles.footerRow}>
                   <span>Open job →</span>
