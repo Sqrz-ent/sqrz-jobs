@@ -14,3 +14,5 @@ export default defineConfig({
     noExternal: ["@vercel/og"],
   },
 });
+
+"@remix-run/dev": "^2.x"
