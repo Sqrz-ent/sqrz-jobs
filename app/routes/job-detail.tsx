@@ -101,7 +101,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 
   // Preview image strategy (fast version for now):
   // You can replace this later with a true dynamic OG generator.
-  const ogImage = "/og/og-1.png";
+    const ogImage = `/og/job?title=${encodeURIComponent(job.position_title)}&company=${encodeURIComponent(job.company_name)}&rate=${encodeURIComponent(job.hourly_rate || "")}&seed=${encodeURIComponent(job.company_slug + "-" + job.position_slug)}`;
 
   return [
     { title },
