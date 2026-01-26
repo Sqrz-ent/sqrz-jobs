@@ -1,18 +1,16 @@
 import { ImageResponse } from "@vercel/og";
-import type { LoaderFunctionArgs } from "@remix-run/node";
 
 export const config = {
   runtime: "edge",
 };
 
-export async function loader({ request }: LoaderFunctionArgs) {
+export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
 
   const title = searchParams.get("title") || "Job";
   const company = searchParams.get("company") || "Promoter";
   const rate = searchParams.get("rate") || "";
 
-  // absolute logo URL (important for edge runtime)
   const logoUrl = new URL("/sqrz-logo.png", request.url).toString();
 
   return new ImageResponse(
@@ -80,9 +78,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
         </div>
       </div>
     ),
-    {
-      width: 1200,
-      height: 630,
-    }
+    { width: 1200, height: 630 }
   );
 }
