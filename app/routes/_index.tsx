@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useLoaderData, useSearchParams } from "react-router";
+import { Link, useFetcher, useLoaderData, useSearchParams } from "react-router";
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 
 type Venue = {
@@ -55,6 +55,12 @@ function formatDate(ts?: number) {
   }
 }
 
+function uniqueById(items: Job[]) {
+  const map = new Map<number, Job>();
+  for (const item of items) map.set(item.id, item);
+  return Array.from(map.values());
+}
+
 export async function loader({ request }: LoaderFunctionArgs) {
   const XANO_BASE_URL = process.env.VITE_XANO_BASE_URL;
   if (!XANO_BASE_URL) throw new Response("Missing VITE_XANO_BASE_URL", { status: 500 });
@@ -77,16 +83,35 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export default function JobsIndex() {
-  const data = useLoaderData<JobsResponse>();
+  const initial = useLoaderData<JobsResponse>();
+  const fetcher = useFetcher<JobsResponse>();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const q = searchParams.get("q") ?? "";
 
+  // local UI state
   const [searchValue, setSearchValue] = useState(q);
 
+  // list state (appends pages)
+  const [items, setItems] = useState<Job[]>(initial.items);
+  const [nextPage, setNextPage] = useState<number | null>(initial.nextPage);
+
+  // When the URL changes (new search), reset list
   useEffect(() => {
     setSearchValue(q);
-  }, [q]);
+    setItems(initial.items);
+    setNextPage(initial.nextPage);
+  }, [q, initial.items, initial.nextPage]);
+
+  // When fetcher returns data, append it
+  useEffect(() => {
+    if (!fetcher.data) return;
+
+    setItems((prev) => uniqueById([...prev, ...(fetcher.data?.items ?? [])]));
+    setNextPage(fetcher.data.nextPage ?? null);
+  }, [fetcher.data]);
+
+  const isLoadingMore = fetcher.state !== "idle";
 
   const colors = useMemo(() => {
     return {
@@ -208,7 +233,6 @@ export default function JobsIndex() {
         display: "flex",
         flexDirection: "column",
         gap: 10,
-        transition: "transform 120ms ease",
       } as const,
 
       cardTitle: {
@@ -247,6 +271,7 @@ export default function JobsIndex() {
         color: colors.textMuted,
         fontSize: 13,
         marginTop: 10,
+        textAlign: "center",
       } as const,
     };
   }, [colors]);
@@ -271,12 +296,16 @@ export default function JobsIndex() {
     setSearchParams(sp, { replace: true });
   };
 
-  const nextPageUrl = useMemo(() => {
-    if (!data.nextPage) return null;
+  const loadMore = () => {
+    if (!nextPage) return;
+    if (isLoadingMore) return;
+
     const sp = new URLSearchParams(searchParams);
-    sp.set("page", String(data.nextPage));
-    return `/?${sp.toString()}`;
-  }, [data.nextPage, searchParams]);
+    sp.set("page", String(nextPage));
+    sp.set("perPage", sp.get("perPage") ?? "12");
+
+    fetcher.load(`/?${sp.toString()}`);
+  };
 
   return (
     <main style={styles.page}>
@@ -289,9 +318,9 @@ export default function JobsIndex() {
             </div>
 
             <div style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <span style={styles.pill}>💼 {data.totalItems ?? data.itemsReceived} jobs</span>
-              <span style={styles.pill}>📄 Page {data.curPage}</span>
-              <span style={styles.pill}>⚡ Powered by SQRZ</span>
+              <span style={styles.pill}>💼 {initial.totalItems ?? initial.itemsReceived} jobs</span>
+              <span style={styles.pill}>📄 Page {initial.curPage}</span>
+              {q && <span style={styles.pill}>🔎 “{q}”</span>}
             </div>
           </div>
 
@@ -326,7 +355,7 @@ export default function JobsIndex() {
         </div>
 
         <section style={styles.grid}>
-          {data.items.map((job) => {
+          {items.map((job) => {
             const date = formatDate(job.start);
             const venue = job.venues?.[0]?.name || job.venues?.[0]?.full_address;
 
@@ -350,15 +379,13 @@ export default function JobsIndex() {
           })}
         </section>
 
-        {data.items.length === 0 && (
-          <div style={styles.small}>No jobs found. Try a different search.</div>
-        )}
+        {items.length === 0 && <div style={styles.small}>No jobs found.</div>}
 
         <div style={styles.paginationRow}>
-          {nextPageUrl ? (
-            <Link to={nextPageUrl} style={{ ...styles.button, textDecoration: "none" }}>
-              Load more
-            </Link>
+          {nextPage ? (
+            <button type="button" style={styles.button} onClick={loadMore} disabled={isLoadingMore}>
+              {isLoadingMore ? "Loading…" : "Load more"}
+            </button>
           ) : (
             <div style={styles.small}>That’s everything 🎉</div>
           )}
