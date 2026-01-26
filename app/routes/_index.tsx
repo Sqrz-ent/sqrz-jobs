@@ -211,6 +211,19 @@ export default function JobsIndex() {
         lineHeight: 1,
       } as const,
 
+      snippet: {
+         margin: 0,
+         marginTop: 2,
+         color: colors.textMuted,
+         fontSize: 14,
+         lineHeight: 1.5,
+         display: "-webkit-box",
+         WebkitLineClamp: 3,
+         WebkitBoxOrient: "vertical",
+         overflow: "hidden",
+      } as const,
+
+
       searchRow: {
         display: "flex",
         gap: 10,
