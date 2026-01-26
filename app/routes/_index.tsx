@@ -412,7 +412,11 @@ export default function JobsIndex() {
 
 
             return (
-              <Link key={job.id} to={`/${job.slug}`} style={styles.card}>
+              <Link
+              key={job.id}
+              to={`/${job.company_slug}/${job.position_slug}`}
+              style={styles.card}
+>
                 <h2 style={styles.cardTitle}>{job.name || "Untitled job"}</h2>
 
                 <div style={styles.metaRow}>
