@@ -509,7 +509,14 @@ useEffect(() => {
             const date = formatDate(job.start);
             const venue = job.venues?.[0]?.name || job.venues?.[0]?.full_address;
             const snippet = makeSnippet(job.description, 200);
-            <div ref={sentinelRef} style={{ height: 1 }} />
+<div
+  ref={sentinelRef}
+  style={{
+    height: 40,
+    marginTop: 40,
+    background: "transparent",
+  }}
+/>
 
 
             return (
