@@ -132,25 +132,25 @@ export default function JobDetail() {
 
       {/* Skills */}
       {job.skills && job.skills.length > 0 && (
-        <section style={{ marginBottom: 40 }}>
-          <h2 style={{ fontSize: 20, marginBottom: 12 }}>Skills</h2>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {job.skills.map((skill) => (
-              <span
-                key={skill}
-                style={{
-                  padding: "6px 12px",
-                  background: "#f1f1f1",
-                  borderRadius: 999,
-                  fontSize: 14,
-                }}
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
+  <section style={{ marginBottom: 40 }}>
+    <h2 style={{ fontSize: 20, marginBottom: 12 }}>Skills</h2>
+    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      {job.skills.map((skill) => (
+        <span
+          key={skill.id}               // ← IMPORTANT
+          style={{
+            padding: "6px 12px",
+            background: "#f1f1f1",
+            borderRadius: 999,
+            fontSize: 14,
+          }}
+        >
+          {skill.task}                 // ← THIS is what you want
+        </span>
+      ))}
+    </div>
+  </section>
+)}
 
       {/* Job description */}
       {job.description && (
