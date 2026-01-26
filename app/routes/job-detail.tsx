@@ -97,13 +97,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
     : `${promoter} is looking for: ${position}.`;
 
   // NOTE: Some platforms want absolute URLs. We'll upgrade this next.
-  const ogImage = `/og/job?title=${encodeURIComponent(
-    position
-  )}&company=${encodeURIComponent(promoter)}&rate=${encodeURIComponent(
-    data?.hourly_rate || ""
-  )}&seed=${encodeURIComponent(
-    (data?.company_slug || promoter) + "-" + (data?.position_slug || position)
-  )}`;
+  const ogImage = "/sqrz-logo-630.png";
 
   return [
     { title },
