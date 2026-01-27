@@ -5,7 +5,7 @@ import {
   useRouteError,
 } from "react-router";
 import type { LoaderFunctionArgs } from "@react-router/node";
-import type { MetaFunction, LinksFunction } from "@remix-run/node";
+import type { MetaFunction, LinksFunction } from "@react-router/node";
 
 type Job = {
   id: string;
