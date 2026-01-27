@@ -2,7 +2,6 @@ import type { LoaderFunctionArgs, MetaFunction } from "@react-router/node";
 import { useLoaderData } from "react-router";
 
 import { JobsHome } from "~/components/JobsHome";
-import { DashboardHome } from "~/components/DashboardHome";
 
 export const meta: MetaFunction = () => [
   { title: "SQRZ" },
@@ -46,10 +45,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export default function Index() {
   const data = useLoaderData<typeof loader>();
-
-  if (data.mode === "dashboard") {
-    return <DashboardHome />;
-  }
 
   return <JobsHome />;
 }
