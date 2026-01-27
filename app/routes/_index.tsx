@@ -1,8 +1,8 @@
-import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import type { LoaderFunctionArgs, MetaFunction } from "@react-router/node";
+import { useLoaderData } from "react-router";
 
 import { JobsHome } from "~/components/JobsHome";
-import { DashboardHome } from "~/components/DashboardHome";
+import { DashboardHome } from "../components/DashboardHome";
 
 export const meta: MetaFunction = () => [
   { title: "SQRZ" },
