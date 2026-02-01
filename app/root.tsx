@@ -34,13 +34,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body>
         {children}
-        <AnalyticsGate />
         <ScrollRestoration />
         <Scripts />
       </body>
     </html>
   );
 }
+
+
+import AnalyticsGate from "@/components/AnalyticsGate";
 
 export default function App() {
   return <Outlet />;
