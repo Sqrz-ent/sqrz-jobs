@@ -43,12 +43,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 
 
 import AnalyticsGate from "./components/AnalyticsGate";
+import CookieBanner from "./components/CookieBanner";
+
 
 export default function App() {
   return (
     <>
       <Outlet />
       <AnalyticsGate />
+      <CookieBanner />
     </>
   );
 }
