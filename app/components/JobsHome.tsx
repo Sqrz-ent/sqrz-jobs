@@ -292,6 +292,13 @@ export function JobsHome() {
         border: `1px solid ${colors.border}`,
         color: colors.textMuted,
       },
+     cardBottom: {
+        marginTop: "auto",
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        },
+
     };
   }, [colors]);
 
@@ -368,19 +375,22 @@ export function JobsHome() {
               >
                 <h2 style={styles.cardTitle}>{job.name}</h2>
                 {snippet && <p style={styles.snippet}>{snippet}</p>}
-               <div style={styles.footerRow}>
-               <span>{date}</span>
-              </div>
+               <div style={styles.cardBottom}>
+  <div style={styles.footerRow}>
+    <span>{date}</span>
+  </div>
 
-              {job.skills && job.skills.length > 0 && (
-              <div style={styles.skillsRow}>
-              {job.skills.slice(0, 4).map((skill) => (
-              <span key={skill.id} style={styles.skillChip}>
-              {skill.task}
-              </span>
-              ))}
-              </div>
-              )}
+  {job.skills && job.skills.length > 0 && (
+    <div style={styles.skillsRow}>
+      {job.skills.slice(0, 4).map((skill) => (
+        <span key={skill.id} style={styles.skillChip}>
+          {skill.task}
+        </span>
+      ))}
+    </div>
+  )}
+</div>
+
 
               </Link>
             );
