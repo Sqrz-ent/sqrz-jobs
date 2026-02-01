@@ -45,7 +45,12 @@ export function Layout({ children }: { children: React.ReactNode }) {
 import AnalyticsGate from "@/components/AnalyticsGate";
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <>
+      <Outlet />
+      <AnalyticsGate />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
