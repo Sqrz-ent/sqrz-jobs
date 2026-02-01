@@ -8,8 +8,8 @@ export default function AnalyticsGate() {
     hasMarketingConsent,
   } = useCookieConsent();
 
-  const GA_ID = "G-CK55029FEL";
-  const FB_PIXEL_ID = "210321700824962";
+  const GA_ID = "G-FHKJKY34R5";
+  const FB_PIXEL_ID = "688478865189075";
   const HUBSPOT_ID = "8081234";
   const LINKEDIN_ID = "2800882";
 
