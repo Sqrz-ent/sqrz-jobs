@@ -13,6 +13,8 @@ export function useCookieConsent() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
+    if (typeof document === "undefined") return;
+
     const match = document.cookie
       .split("; ")
       .find((row) => row.startsWith(`${COOKIE_NAME}=`));
