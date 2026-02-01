@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useCookieConsent } from "@/hooks/useCookieConsent";
+import { useCookieConsent } from "./hooks/useCookieConsent";
 
 export default function AnalyticsGate() {
   const {
