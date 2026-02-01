@@ -4,7 +4,7 @@ import { useLoaderData } from "react-router";
 import { JobsHome } from "~/components/JobsHome";
 
 export const meta: MetaFunction = () => [
-  { title: "SQRZ" },
+  { title: "SQRZ - The Link-In-Bio that gets you booked! " },
 ];
 
 export async function loader({ request }: LoaderFunctionArgs) {
