@@ -13,8 +13,9 @@ export default function AnalyticsGate() {
   const HUBSPOT_ID = "8081234";
   const LINKEDIN_ID = "2800882";
 
-  useEffect(() => {
-    if (!isReady) return;
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  if (!isReady) return;
 
     // Prevent double injection
     if (document.getElementById("sqrz-analytics-loaded")) return;
