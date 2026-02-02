@@ -7,12 +7,13 @@ import type { MetaFunction } from "@react-router/node";
 import { JobsHome } from "~/components/JobsHome";
 
 
+
 export const meta: MetaFunction = () => {
   const title = "SQRZ - The Link-In-Bio that gets you booked!";
   const description =
     "Browse freelance crew jobs, touring gigs, conferences and event work. Get booked with SQRZ.";
 
-  const ogImage = "/sqrz-logo-630.png";
+  const ogImage = "/sqrz-logo-jobs.png";
 
   return [
     { title },
