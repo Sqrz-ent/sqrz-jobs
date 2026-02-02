@@ -129,6 +129,9 @@ export function JobsHome() {
   const { jobs: initial } = useLoaderData<{ jobs: JobsResponse }>();
   const fetcher = useFetcher<JobsResponse>();
   const [searchParams, setSearchParams] = useSearchParams();
+  const activeType = searchParams.get("type");
+  const types = ["media", "academic", "STEM", "linguistic"];
+
 
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
@@ -354,6 +357,8 @@ export function JobsHome() {
             </div>
           </div>
 
+
+
           <button
             onClick={() => setTheme(isDark ? "light" : "dark")}
             style={styles.themeToggle}
@@ -361,6 +366,47 @@ export function JobsHome() {
             {isDark ? "☀️" : "🌙"}
           </button>
         </header>
+
+
+
+<div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+  <button
+    onClick={() => {
+      const sp = new URLSearchParams(searchParams);
+      sp.delete("type");
+      setSearchParams(sp);
+    }}
+    style={{
+      ...styles.pill,
+      background: !activeType ? colors.brand : styles.pill.background,
+      color: !activeType ? colors.brandText : styles.pill.color,
+      cursor: "pointer",
+    }}
+  >
+    All
+  </button>
+
+  {types.map((t) => (
+    <button
+      key={t}
+      onClick={() => {
+        const sp = new URLSearchParams(searchParams);
+        sp.set("type", t);
+        setSearchParams(sp);
+      }}
+      style={{
+        ...styles.pill,
+        background: activeType === t ? colors.brand : styles.pill.background,
+        color: activeType === t ? colors.brandText : styles.pill.color,
+        cursor: "pointer",
+      }}
+    >
+      {t}
+    </button>
+  ))}
+</div>
+
+
 
         <section style={styles.grid}>
           {items.map((job) => {

@@ -48,6 +48,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   const url = new URL(request.url);
   const q = url.searchParams.get("q") ?? "";
+  const type = url.searchParams.get("type") ?? "";
   const page = url.searchParams.get("page") ?? "1";
   const perPage = url.searchParams.get("perPage") ?? "12";
 
@@ -55,6 +56,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   apiUrl.searchParams.set("page", page);
   apiUrl.searchParams.set("perPage", perPage);
   if (q.trim()) apiUrl.searchParams.set("q", q.trim());
+  if (type) apiUrl.searchParams.set("type", type);
 
   const res = await fetch(apiUrl.toString());
   if (!res.ok) {
