@@ -329,6 +329,12 @@ spinner: {
   borderRadius: "50%",
   animation: "spin 0.8s linear infinite",
 },
+gridLoading: {
+  opacity: 0.35,
+  filter: "blur(2px)",
+  transition: "all 180ms ease",
+  pointerEvents: "none",
+},
 
 
 
@@ -446,7 +452,12 @@ spinner: {
 
 
 
-        <section style={styles.grid}>
+<section
+  style={{
+    ...styles.grid,
+    ...(isLoading ? styles.gridLoading : {}),
+  }}
+>
           {items.map((job) => {
             const snippet = makeSnippet(job.description, 200);
             const date = formatDate(job.start);
