@@ -52,13 +52,6 @@ type JobsResponse = {
    Theme
 ========================= */
 
-<style>
-{`
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-`}
-</style>
 
 
 
@@ -314,21 +307,7 @@ export function JobsHome() {
         flexDirection: "column",
         gap: 8,
         },
-        loader: {
-  display: "flex",
-  justifyContent: "center",
-  padding: "40px 0",
-  color: colors.textMuted,
-  fontSize: 14,
-},
-spinner: {
-  width: 18,
-  height: 18,
-  border: `2px solid ${colors.border}`,
-  borderTop: `2px solid ${colors.brand}`,
-  borderRadius: "50%",
-  animation: "spin 0.8s linear infinite",
-},
+       
 gridLoading: {
   opacity: 0.35,
   filter: "blur(2px)",
@@ -442,13 +421,6 @@ gridLoading: {
     </button>
   ))}
 </div>
-
-
-{isLoading && (
-  <div style={styles.loader}>
-    <div style={styles.spinner} />
-  </div>
-)}
 
 
 
