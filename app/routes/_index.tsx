@@ -1,11 +1,37 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@react-router/node";
 import { useLoaderData } from "react-router";
+import type { MetaFunction } from "@react-router/node";
+
+
 
 import { JobsHome } from "~/components/JobsHome";
 
-export const meta: MetaFunction = () => [
-  { title: "SQRZ - The Link-In-Bio that gets you booked! " },
-];
+
+export const meta: MetaFunction = () => {
+  const title = "SQRZ - The Link-In-Bio that gets you booked!";
+  const description =
+    "Browse freelance crew jobs, touring gigs, conferences and event work. Get booked with SQRZ.";
+
+  const ogImage = "/sqrz-logo-630.png";
+
+  return [
+    { title },
+    { name: "description", content: description },
+
+    // OpenGraph
+    { property: "og:title", content: title },
+    { property: "og:description", content: description },
+    { property: "og:type", content: "website" },
+    { property: "og:image", content: ogImage },
+
+    // Twitter
+    { name: "twitter:card", content: "summary_large_image" },
+    { name: "twitter:title", content: title },
+    { name: "twitter:description", content: description },
+    { name: "twitter:image", content: ogImage },
+  ];
+};
+
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const host = request.headers.get("host") ?? "";
